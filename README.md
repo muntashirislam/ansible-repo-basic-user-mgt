@@ -9,7 +9,7 @@ This will do basic of these task mentioned bellow. An ansible playbook that I ca
     - The playbook should go through the list of users and compare them against users on the server and get rid of stale users but not important system users.
     - You Ansible playbook should be able to be hooked on to a CI service and it can run i. Syntax check ii. Other tests which you deem necessary (as elaborate as possible, go crazy!) 
 
-=============================Requirement and information Before Run==================================
+=============================Requirement and information before run==================================
 1. Add your machine (From where you want to run this play book) ssh key to pub_keys directory
 2. Change your user name on user.yml file
 3. Add any user to obsolete_user_list.yml. If the user is stale then playbook will remove it
