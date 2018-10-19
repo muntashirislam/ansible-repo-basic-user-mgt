@@ -1,0 +1,8 @@
+---
+users:
+  - username: muntashir
+    use_sudo: yes
+
+
+  - username: admin
+    use_sudo: yes

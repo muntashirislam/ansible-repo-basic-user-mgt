@@ -1,0 +1,68 @@
+---
+- hosts: all
+  become: yes
+
+#This ansible playbook written to achive the questions only
+  tasks:
+#Add number of users on users.yml as per requirement so that those user will create on the instance. obsolete_user_list.yml use for user deletion
+
+  - include_vars: users.yml
+  - include_vars: obsolete_user_list.yml
+#Add New user with shell and home directory
+  - name: Add users | create users, shell, home dirs
+    user: name={{ item.username }} shell=/bin/bash createhome=yes comment='create with ansible'
+    with_items: '{{users}}'
+#Upload a authorized key of your host machine so that you can easily verify whether user created or not
+  - name: Setup authorized keys | authorized key upload
+    authorized_key: user={{ item.username }}
+     key="{{ lookup('file', 'pub_keys/id_rsa.pub') }}"
+    with_items: '{{users}}'
+# Update user and add them to sudoers so that there is no password required to work with those users
+  - name: Sudoers | update sudoers file and validate user on this group no password required to work with this users
+    lineinfile: "dest=/etc/sudoers
+      insertafter=EOF
+      line='{{ item.username }} ALL=(ALL) NOPASSWD: ALL'
+      regexp='^{{ item.username }} .*'
+      state=present"
+    when: '{{ item.use_sudo }} == True'
+    with_items: '{{users}}'
+#This commented portion is to delete inactive or stale user from obsolete_user_list.yml 
+ # - name: "Delete obsolete users"
+  #  user: >
+  #    name="{{ item }}"
+  #    force="yes"
+  #    remove="yes"
+  #    state="absent"
+  #  with_items: obsolete_user_list
+
+ #This  portion is to delete inactive or stale user from obsolete_user_list.yml if there is any stale user available on 
+  - shell: 'cut -d: -f1 /etc/passwd'
+    register: userspassst
+  - user: name={{item}} state=absent remove=yes
+    with_items: userspassst.stdout_lines
+    when: item in obsolete_user_list
+ #Generate own RSA keys for allow other user to ssh this server
+  - name: Generating RSA key for root
+    user: name={{ item.username }} generate_ssh_key=yes
+    with_items: '{{users}}'
+#Download public key to localhost
+  - name: Downloading pub key
+    fetch: src=/home/{{ item.username }}/.ssh/id_rsa.pub dest=pub_keys/{{ item.username }}{{lookup('pipe', 'date +%Y%m%d-%H%M%S-%N')}}.tmp flat=yes
+    with_items: '{{users}}'
+  #add those all server so that any user of any server can login 
+  - name: Setup | authorized key upload
+    authorized_key: user={{ item.username }} key="{{ lookup('pipe','cat pub_keys/*.tmp') }}" 
+                    path='/home/{{ item.username }}/.ssh/authorized_keys'
+    with_items: '{{users}}'
+
+  
+  
+  
+    
+  
+    
+
+ 
+    
+    
+  
