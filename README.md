@@ -14,7 +14,8 @@ This will do basic of these task mentioned bellow. An ansible playbook that I ca
 2. Change your user name on user.yml file
 3. Add any user to obsolete_user_list.yml. If the user is stale then playbook will remove it.
 4. Change the Inventory file as per requirement.
-5. I did not hook this playbook to CI service till now.
+5. Jenkins Playbook checker simplejob can be added. Add Ansible playbook plugins and then to import that job from jenkins-job folder run following command
 
+java -jar jenkins-cli.jar -s http://192.168.0.103:8080/ create-job Ansible-Modified-Job < config.xml --username "$USERNAME" --password "$PASSWORD" 
 This project will update day by day.
 
