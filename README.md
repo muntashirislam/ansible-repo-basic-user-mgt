@@ -16,5 +16,5 @@ This will do basic of these task mentioned bellow. An ansible playbook that I ca
 4. Change the Inventory file as per requirement.
 5. I did not hook this playbook to CI service till now.
 
-This project will update day by day
+This project will update day by day.
 
